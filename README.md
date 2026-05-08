@@ -61,7 +61,7 @@ Python and Streamlit for the app, Claude API as the agent brain, pdfplumber for 
 
 ## What is coming next
 
-**Artha is currently a local tool you run on your own machine. The plan is to turn this into a fully deployed web app so anyone can use it without any setup. No cloning, no terminal, no API key hassle. Just open a link and go. Stay tuned.
+Artha is currently a local tool you run on your own machine. The plan is to turn this into a fully deployed web app so anyone can use it without any setup. No cloning, no terminal, no API key hassle. Just open a link and go. Stay tuned.
 
 ---
 
