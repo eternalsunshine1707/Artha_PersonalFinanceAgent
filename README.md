@@ -78,3 +78,7 @@ On the LLM side, Artha runs on Claude and that was a deliberate choice. You coul
 ## Contributing
 
 Open source and open to contributions. If you run into a bank format that does not parse correctly or have a feature idea, open an issue or send a PR.
+
+
+Built by Sravani, who got tired of guessing where her money went and built Artha to finally get a straight answer!
+Check out more projects at https://github.com/eternalsunshine1707
