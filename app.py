@@ -159,6 +159,74 @@ h1, h2, h3, h4, h5, h6 {{
     border: 1px solid {c['border']} !important;
     border-radius: 8px !important;
 }}
+/* ── Header branding (beats global div/span color reset) ── */
+.artha-header-row {{
+    position: relative;
+    width: 100%;
+    padding: 18px 8px 14px;
+    box-sizing: border-box;
+}}
+.artha-brand-cluster {{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(12px, 3vw, 20px);
+    flex-wrap: wrap;
+    text-align: center;
+}}
+.artha-logo-square {{
+    width: clamp(46px, 10vw, 56px);
+    height: clamp(46px, 10vw, 56px);
+    background: {c['accent']} !important;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}}
+.artha-logo-letter {{
+    font-size: clamp(22px, 5vw, 28px);
+    font-weight: 800;
+    line-height: 1;
+    color: #FFFFFF !important;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}}
+.artha-brand-text {{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 0;
+}}
+.artha-brand-title {{
+    font-size: clamp(2rem, 5.5vw, 2.85rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    color: {c['accent']} !important;
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}}
+.artha-brand-tagline {{
+    font-size: clamp(0.95rem, 2.4vw, 1.08rem);
+    font-weight: 400;
+    line-height: 1.45;
+    color: {c['secondary']} !important;
+    margin: 0.45rem 0 0 0;
+    max-width: 28rem;
+    font-style: italic;
+    opacity: 0.95;
+}}
+@media (max-width: 480px) {{
+    .artha-brand-cluster {{
+        flex-direction: column;
+        gap: 10px;
+    }}
+    .artha-brand-text {{
+        align-items: center;
+    }}
+}}
 /* ── Hide default Streamlit branding ── */
 #MainMenu, footer, header[data-testid="stHeader"] {{
     visibility: hidden;
@@ -275,19 +343,19 @@ def show_api_error():
 
 def render_topbar():
     c = C()
-    col_logo, col_toggle = st.columns([8, 1])
+    col_main, col_toggle = st.columns([11, 1])
 
-    with col_logo:
+    with col_main:
         st.markdown(
             f"""
-<div style="display:flex;align-items:center;gap:14px;padding:8px 0 4px;">
-  <div style="width:44px;height:44px;background:{c['accent']};border-radius:8px;
-       display:flex;align-items:center;justify-content:center;
-       font-size:22px;font-weight:900;color:#fff;flex-shrink:0;">A</div>
-  <div>
-    <div style="font-size:28px;font-weight:800;color:{c['accent']};line-height:1.1;">Artha</div>
-    <div style="font-size:12px;color:{c['secondary']};font-style:italic;margin-top:1px;">
-      Your money has a story. Artha reads it!
+<div class="artha-header-row">
+  <div class="artha-brand-cluster">
+    <div class="artha-logo-square">
+      <span class="artha-logo-letter">A</span>
+    </div>
+    <div class="artha-brand-text">
+      <div class="artha-brand-title">Artha</div>
+      <p class="artha-brand-tagline">Your money has a story. Artha reads it!</p>
     </div>
   </div>
 </div>
@@ -301,7 +369,10 @@ def render_topbar():
             st.session_state.dark_mode = not st.session_state.dark_mode
             st.rerun()
 
-    st.markdown(f'<hr style="border:none;border-top:1px solid {c["border"]};margin:8px 0 20px;">', unsafe_allow_html=True)
+    st.markdown(
+        f'<hr style="border:none;border-top:1px solid {c["border"]};margin:4px 0 22px;">',
+        unsafe_allow_html=True,
+    )
 
 
 # ── Emotional check-in ─────────────────────────────────────────────────────────
