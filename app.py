@@ -163,68 +163,99 @@ h1, h2, h3, h4, h5, h6 {{
 .artha-header-row {{
     position: relative;
     width: 100%;
-    padding: 18px 8px 14px;
     box-sizing: border-box;
+    padding: clamp(20px, 3vw, 36px) clamp(12px, 3.5vw, 40px) clamp(22px, 3.2vw, 40px);
 }}
 .artha-brand-cluster {{
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: clamp(12px, 3vw, 20px);
-    flex-wrap: wrap;
-    text-align: center;
+    justify-content: flex-start;
+    gap: clamp(16px, 3.5vw, 36px);
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 100%;
 }}
 .artha-logo-square {{
-    width: clamp(46px, 10vw, 56px);
-    height: clamp(46px, 10vw, 56px);
-    background: {c['accent']} !important;
-    border-radius: 10px;
+    width: clamp(56px, 11vw, 76px);
+    height: clamp(56px, 11vw, 76px);
+    background: #1B2A4A !important;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    align-self: flex-start;
+    margin-top: clamp(2px, 0.6vw, 8px);
+    box-shadow:
+        0 2px 8px rgba(27, 42, 74, 0.18),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
 }}
 .artha-logo-letter {{
-    font-size: clamp(22px, 5vw, 28px);
-    font-weight: 800;
+    font-size: clamp(28px, 6.5vw, 40px);
+    font-weight: 900;
     line-height: 1;
+    letter-spacing: -0.03em;
     color: #FFFFFF !important;
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }}
 .artha-brand-text {{
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: stretch;
+    justify-content: center;
+    text-align: left;
+    flex: 1;
     min-width: 0;
+    gap: clamp(6px, 1.2vw, 12px);
 }}
-.artha-brand-title {{
-    font-size: clamp(2rem, 5.5vw, 2.85rem);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.08;
+h1.artha-brand-title {{
+    font-size: clamp(3rem, 6.2vw + 1.2rem, 7.25rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 0.97;
     color: {c['accent']} !important;
-    margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    margin: 0 !important;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }}
 .artha-brand-tagline {{
-    font-size: clamp(0.95rem, 2.4vw, 1.08rem);
-    font-weight: 400;
+    font-size: clamp(1.05rem, 2.1vw + 0.35rem, 1.35rem);
     line-height: 1.45;
+    text-align: left;
     color: {c['secondary']} !important;
-    margin: 0.45rem 0 0 0;
-    max-width: 28rem;
-    font-style: italic;
-    opacity: 0.95;
+    margin: 0;
+    padding: 0;
+    max-width: 36rem;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    opacity: 0.92;
 }}
-@media (max-width: 480px) {{
+@media (max-width: 900px) {{
+    .artha-brand-cluster {{
+        flex-wrap: nowrap;
+        align-items: center;
+    }}
+    h1.artha-brand-title {{
+        letter-spacing: -0.032em;
+    }}
+}}
+@media (max-width: 540px) {{
     .artha-brand-cluster {{
         flex-direction: column;
-        gap: 10px;
+        align-items: flex-start;
+        gap: 14px;
+    }}
+    .artha-logo-square {{
+        margin-top: 0;
     }}
     .artha-brand-text {{
-        align-items: center;
+        width: 100%;
     }}
 }}
 /* ── Hide default Streamlit branding ── */
@@ -343,7 +374,7 @@ def show_api_error():
 
 def render_topbar():
     c = C()
-    col_main, col_toggle = st.columns([11, 1])
+    col_main, col_toggle = st.columns([14, 1])
 
     with col_main:
         st.markdown(
@@ -354,7 +385,7 @@ def render_topbar():
       <span class="artha-logo-letter">A</span>
     </div>
     <div class="artha-brand-text">
-      <div class="artha-brand-title">Artha</div>
+      <h1 class="artha-brand-title">ARTHA!</h1>
       <p class="artha-brand-tagline">Your money has a story. Artha reads it!</p>
     </div>
   </div>
@@ -370,7 +401,7 @@ def render_topbar():
             st.rerun()
 
     st.markdown(
-        f'<hr style="border:none;border-top:1px solid {c["border"]};margin:4px 0 22px;">',
+        f'<hr style="border:none;border-top:1px solid {c["border"]};margin:0 0 clamp(20px, 3vw, 28px);">',
         unsafe_allow_html=True,
     )
 
