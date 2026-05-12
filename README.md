@@ -71,8 +71,7 @@ artha/
 
 ## A few things worth mentioning!
 
-The transaction data Artha produces is clean and structured, so it could technically feed into a Power BI dashboard if you wanted that kind of visual reporting layer. That is not something being built into Artha itself since the Streamlit interface already handles it, but the data is ready for it if you ever want to take it that direction.
-On the LLM side, Artha runs on Claude and that was a deliberate choice. You could swap in ChatGPT or another model since the agent logic is not tied to any specific provider, but toggling between two models creates inconsistency in tone and output, which defeats the whole point of Artha having a consistent personality. So Claude it is.
+The transaction data Artha produces is clean and structured, so it could technically feed into a Power BI dashboard if you wanted that kind of visual reporting layer. That is not something being built into Artha itself since the Streamlit interface already handles it, but the data is ready for it if you ever want to take it that direction. On the LLM side, Artha runs on Claude and that was a deliberate choice. You could swap in ChatGPT or another model since the agent logic is not tied to any specific provider, but toggling between two models creates inconsistency in tone and output, which defeats the whole point of Artha having a consistent personality. So Claude it is.
 
 
 ## Contributing

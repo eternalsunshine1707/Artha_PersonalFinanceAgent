@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Artha – Background Options</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: #e8ecf2;
+    padding: 32px 24px;
+  }
+  h2.page-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1B2A4A;
+    margin-bottom: 32px;
+    letter-spacing: -0.02em;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  .card {
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+    border: 2px solid rgba(255,255,255,0.7);
+  }
+  .label {
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1B2A4A;
+    margin-top: 14px;
+    margin-bottom: 4px;
+    letter-spacing: 0.01em;
+  }
+  .sublabel {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #555;
+    margin-bottom: 20px;
+  }
+
+  /* ── Shared mock content styles ── */
+  .mock {
+    padding: 28px 24px 32px;
+    min-height: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .mock-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(27,42,74,0.1);
+  }
+  .mock-logo {
+    width: 42px; height: 42px;
+    background: #1B2A4A;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 900; font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .mock-title { font-size: 1.8rem; font-weight: 900; color: #1B2A4A; letter-spacing: -0.04em; }
+  .mock-tag { font-size: 0.7rem; color: #1B2A4A; font-weight: 600; margin-left: auto; }
+  .steps-card {
+    width: 100%;
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 18px;
+    box-shadow: 0 2px 12px rgba(27,42,74,0.08);
+    border: 1px solid rgba(27,42,74,0.07);
+  }
+  .steps-title {
+    font-size: 1rem; font-weight: 700; color: #1B2A4A;
+    text-align: center; margin-bottom: 18px;
+  }
+  .steps-row {
+    display: flex; gap: 10px; justify-content: space-between;
+  }
+  .step {
+    flex: 1; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .step-icon {
+    width: 44px; height: 44px;
+    background: #EEF2FA;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+  }
+  .step-num { font-size: 0.65rem; font-weight: 700; color: #1B2A4A; }
+  .step-desc { font-size: 0.62rem; color: #444; line-height: 1.4; }
+  .mock-upload {
+    width: 100%; margin-top: 16px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 2px 12px rgba(27,42,74,0.08);
+    border: 1px solid rgba(27,42,74,0.07);
+  }
+  .upload-title { font-size: 0.85rem; font-weight: 700; color: #1B2A4A; margin-bottom: 10px; }
+  .upload-box {
+    border: 2px dashed #1B2A4A;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #555;
+  }
+
+  /* ══════════════════════════════════════
+     OPTION 1 — Soft gradient
+  ══════════════════════════════════════ */
+  .opt1 { background: linear-gradient(135deg, #EEF2FA 0%, #F5F0FF 50%, #EAF4F0 100%); }
+
+  /* ══════════════════════════════════════
+     OPTION 2 — Dot pattern
+  ══════════════════════════════════════ */
+  .opt2 {
+    background-color: #F4F6FA;
+    background-image: radial-gradient(circle, #1B2A4A 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  /* ══════════════════════════════════════
+     OPTION 3 — Flat + card depth
+  ══════════════════════════════════════ */
+  .opt3 { background: #F4F6FA; }
+  .opt3 .steps-card {
+    box-shadow: 0 6px 28px rgba(27,42,74,0.14);
+    border-top: 3px solid #1B2A4A;
+  }
+  .opt3 .mock-upload {
+    box-shadow: 0 6px 28px rgba(27,42,74,0.14);
+    border-top: 3px solid #1B2A4A;
+  }
+</style>
+</head>
+<body>
+
+<h2 class="page-title">Artha — Background Preview Options</h2>
+
+<div class="grid">
+
+  <!-- OPTION 1 -->
+  <div>
+    <div class="card">
+      <div class="mock opt1">
+        <div class="mock-header">
+          <div class="mock-logo">A</div>
+          <div class="mock-title">ARTHA!</div>
+          <div class="mock-tag">Your money has a story. Artha reads it!</div>
+        </div>
+        <div class="steps-card">
+          <div class="steps-title">Get started in 3 steps</div>
+          <div class="steps-row">
+            <div class="step"><div class="step-icon">📄</div><div class="step-num">Step 1</div><div class="step-desc">Upload your bank statements</div></div>
+            <div class="step"><div class="step-icon">🔍</div><div class="step-num">Step 2</div><div class="step-desc">Artha reads & analyzes</div></div>
+            <div class="step"><div class="step-icon">💬</div><div class="step-num">Step 3</div><div class="step-desc">Ask anything about your money</div></div>
+          </div>
+        </div>
+        <div class="mock-upload">
+          <div class="upload-title">Upload Bank Statements</div>
+          <div class="upload-box">Drag and drop files here · PDF</div>
+        </div>
+      </div>
+    </div>
+    <div class="label">Option 1 — Soft Gradient</div>
+    <div class="sublabel">Blue → lavender → mint, 135° diagonal</div>
+  </div>
+
+  <!-- OPTION 2 -->
+  <div>
+    <div class="card">
+      <div class="mock opt2">
+        <div class="mock-header">
+          <div class="mock-logo">A</div>
+          <div class="mock-title">ARTHA!</div>
+          <div class="mock-tag">Your money has a story. Artha reads it!</div>
+        </div>
+        <div class="steps-card">
+          <div class="steps-title">Get started in 3 steps</div>
+          <div class="steps-row">
+            <div class="step"><div class="step-icon">📄</div><div class="step-num">Step 1</div><div class="step-desc">Upload your bank statements</div></div>
+            <div class="step"><div class="step-icon">🔍</div><div class="step-num">Step 2</div><div class="step-desc">Artha reads & analyzes</div></div>
+            <div class="step"><div class="step-icon">💬</div><div class="step-num">Step 3</div><div class="step-desc">Ask anything about your money</div></div>
+          </div>
+        </div>
+        <div class="mock-upload">
+          <div class="upload-title">Upload Bank Statements</div>
+          <div class="upload-box">Drag and drop files here · PDF</div>
+        </div>
+      </div>
+    </div>
+    <div class="label">Option 2 — Dot Pattern</div>
+    <div class="sublabel">Subtle navy dots grid on light bg</div>
+  </div>
+
+  <!-- OPTION 3 -->
+  <div>
+    <div class="card">
+      <div class="mock opt3">
+        <div class="mock-header">
+          <div class="mock-logo">A</div>
+          <div class="mock-title">ARTHA!</div>
+          <div class="mock-tag">Your money has a story. Artha reads it!</div>
+        </div>
+        <div class="steps-card">
+          <div class="steps-title">Get started in 3 steps</div>
+          <div class="steps-row">
+            <div class="step"><div class="step-icon">📄</div><div class="step-num">Step 1</div><div class="step-desc">Upload your bank statements</div></div>
+            <div class="step"><div class="step-icon">🔍</div><div class="step-num">Step 2</div><div class="step-desc">Artha reads & analyzes</div></div>
+            <div class="step"><div class="step-icon">💬</div><div class="step-num">Step 3</div><div class="step-desc">Ask anything about your money</div></div>
+          </div>
+        </div>
+        <div class="mock-upload">
+          <div class="upload-title">Upload Bank Statements</div>
+          <div class="upload-box">Drag and drop files here · PDF</div>
+        </div>
+      </div>
+    </div>
+    <div class="label">Option 3 — Flat + Card Depth</div>
+    <div class="sublabel">Same flat bg, cards pop with navy top-border</div>
+  </div>
+
+</div>
+</body>
+</html>
