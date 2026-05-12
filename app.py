@@ -63,12 +63,15 @@ def inject_css():
     st.markdown(
         f"""
 <style>
-/* ── Page background with dot pattern ── */
-.stApp {{
+/* ── Dot pattern on the root elements that Streamlit can't override ── */
+html, body {{
     background-color: {c['bg']} !important;
-    background-image: radial-gradient(circle, rgba(27,42,74,0.12) 1px, transparent 1px) !important;
+    background-image: radial-gradient(circle, rgba(27,42,74,0.13) 1.5px, transparent 1.5px) !important;
     background-size: 22px 22px !important;
+    background-attachment: fixed !important;
 }}
+/* Make layout wrappers transparent so dot pattern shows through */
+.stApp,
 [data-testid="stAppViewContainer"],
 [data-testid="stHeader"],
 section[data-testid="stMain"],
@@ -76,32 +79,60 @@ section[data-testid="stMain"] > div,
 .block-container,
 [data-testid="stMainBlockContainer"],
 .appview-container,
-.main {{
+.main,
+.css-1d391kg, .css-18e3th9 {{
     background-color: transparent !important;
     background-image: none !important;
 }}
 [data-testid="stSidebar"] {{
     background-color: {c['card']} !important;
+    background-image: none !important;
 }}
-/* ── Global text — catch everything Streamlit renders ── */
+/* ── Global text colours ── */
 html, body {{
     color: {c['text']} !important;
 }}
-p, span, div, label,
-.stMarkdown, .stMarkdown p,
-[data-testid="stText"],
-[data-testid="stCaption"],
-[data-baseweb="caption"],
-small, .caption,
-[data-testid="stFileUploaderDropzoneInstructions"],
-[data-testid="stFileUploaderDropzone"] small,
-[data-testid="stFileUploaderDropzone"] span,
-[class*="st-emotion-cache"] {{
+.stMarkdown p, .stMarkdown li,
+[data-testid="stText"], [data-testid="stCaption"],
+[data-baseweb="caption"], .caption,
+[data-testid="stWidgetLabel"] p,
+[data-testid="stMarkdownContainer"] p {{
     color: {c['text']} !important;
+}}
+/* File uploader all text */
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] p,
+[data-testid="stFileUploaderDropzoneInstructions"] *,
+[data-testid="stFileUploaderDropzone"] * {{
+    color: {c['text']} !important;
+}}
+/* Dropzone background must match card in both modes */
+[data-testid="stFileUploaderDropzone"] {{
+    background-color: {c['card']} !important;
+}}
+/* Browse files button — always dark text since it has a light bg */
+[data-testid="stFileUploaderDropzone"] button {{
+    background-color: #FFFFFF !important;
+    color: #1B2A4A !important;
+    border: 1px solid #1B2A4A !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+}}
+/* Buttons always white text */
+.stButton > button, .stButton > button * {{
+    color: #FFFFFF !important;
+}}
+/* Logo letter always white — override any stMarkdown span cascade */
+span.artha-logo-letter {{
+    color: #FFFFFF !important;
 }}
 h1, h2, h3, h4, h5, h6 {{
     color: {c['accent']} !important;
-    font-size: revert !important;
+}}
+/* Input placeholder text */
+input::placeholder, textarea::placeholder {{
+    color: {c['secondary']} !important;
+    opacity: 1 !important;
 }}
 /* ── Buttons ── */
 .stButton > button {{
@@ -137,6 +168,11 @@ h1, h2, h3, h4, h5, h6 {{
     border: 1px solid {c['border']} !important;
     border-radius: 6px !important;
     color: {c['text']} !important;
+}}
+.stTextInput > div > div > input:focus,
+.stTextArea textarea:focus {{
+    color: {c['text']} !important;
+    border-color: {c['accent']} !important;
 }}
 /* ── File uploader ── */
 [data-testid="stFileUploader"] {{
@@ -177,8 +213,8 @@ h1, h2, h3, h4, h5, h6 {{
     border: 1px solid {c['border']} !important;
 }}
 /* ── Checkbox ── */
-.stCheckbox label {{
-    color: {c['secondary']} !important;
+.stCheckbox label, .stCheckbox label p, .stCheckbox span {{
+    color: {c['text']} !important;
 }}
 /* ── Progress bar ── */
 .stProgress > div > div {{
@@ -191,6 +227,11 @@ h1, h2, h3, h4, h5, h6 {{
     border-top: 3px solid {c['accent']} !important;
     border-radius: 8px !important;
     box-shadow: 0 6px 24px rgba(27,42,74,0.12) !important;
+}}
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary span,
+[data-testid="stExpander"] summary p {{
+    color: {c['text']} !important;
 }}
 /* ── Header branding (beats global div/span color reset) ── */
 .artha-header-row {{
@@ -593,11 +634,17 @@ def render_onboarding():
   }}
   .footer {{
     text-align: center;
-    font-size: 13px;
-    color: {accent};
+    font-size: 16px;
+    color: #1A7F4B;
     margin-top: 32px;
-    font-weight: 600;
-    opacity: 0.7;
+    font-weight: 700;
+    opacity: 1;
+    background: rgba(26,127,75,0.08);
+    border: 1.5px solid rgba(26,127,75,0.25);
+    border-radius: 8px;
+    padding: 10px 20px;
+    display: inline-block;
+    width: 100%;
   }}
 
   /* float animation */
@@ -684,7 +731,7 @@ def render_onboarding():
 </div>
 </body>
 </html>
-""", height=310)
+""", height=370)
 
 
 
@@ -696,8 +743,8 @@ def render_upload():
     st.markdown(
         f"""
 <div style="margin-bottom:8px;">
-  <span style="background:#E8F5EE;color:{c['good']};border:1px solid {c['good']};
-        border-radius:999px;padding:4px 14px;font-size:12px;font-weight:600;">
+  <span style="background:{c['card']};color:{c['good']};border:2px solid {c['good']};
+        border-radius:999px;padding:5px 16px;font-size:13px;font-weight:700;">
     🔒 Your file never leaves your device
   </span>
 </div>
