@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -31,7 +32,7 @@ LIGHT = {
     "card": "#FFFFFF",
     "accent": "#1B2A4A",
     "text": "#1B2A4A",
-    "secondary": "#666666",
+    "secondary": "#3A4D6B",
     "good": "#1A7F4B",
     "bad": "#A32D2D",
     "border": "#E0E0E0",
@@ -62,25 +63,45 @@ def inject_css():
     st.markdown(
         f"""
 <style>
-/* ── Page ── */
-.stApp, [data-testid="stAppViewContainer"] {{
+/* ── Page background with dot pattern ── */
+.stApp {{
     background-color: {c['bg']} !important;
+    background-image: radial-gradient(circle, rgba(27,42,74,0.12) 1px, transparent 1px) !important;
+    background-size: 22px 22px !important;
 }}
-[data-testid="stHeader"] {{
-    background-color: {c['bg']} !important;
+[data-testid="stAppViewContainer"],
+[data-testid="stHeader"],
+section[data-testid="stMain"],
+section[data-testid="stMain"] > div,
+.block-container,
+[data-testid="stMainBlockContainer"],
+.appview-container,
+.main {{
+    background-color: transparent !important;
+    background-image: none !important;
 }}
 [data-testid="stSidebar"] {{
     background-color: {c['card']} !important;
 }}
-section[data-testid="stMain"] > div {{
-    background-color: {c['bg']} !important;
+/* ── Global text — catch everything Streamlit renders ── */
+html, body {{
+    color: {c['text']} !important;
 }}
-/* ── Global text ── */
-html, body, [class*="css"], p, span, div, label, .stMarkdown {{
+p, span, div, label,
+.stMarkdown, .stMarkdown p,
+[data-testid="stText"],
+[data-testid="stCaption"],
+[data-baseweb="caption"],
+small, .caption,
+[data-testid="stFileUploaderDropzoneInstructions"],
+[data-testid="stFileUploaderDropzone"] small,
+[data-testid="stFileUploaderDropzone"] span,
+[class*="st-emotion-cache"] {{
     color: {c['text']} !important;
 }}
 h1, h2, h3, h4, h5, h6 {{
     color: {c['accent']} !important;
+    font-size: revert !important;
 }}
 /* ── Buttons ── */
 .stButton > button {{
@@ -124,15 +145,25 @@ h1, h2, h3, h4, h5, h6 {{
     border-radius: 10px !important;
     padding: 8px !important;
 }}
-[data-testid="stFileUploader"] label {{
+[data-testid="stFileUploader"] *,
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] span,
+[data-testid="stFileUploader"] small,
+[data-testid="stFileUploader"] p {{
+    color: {c['text']} !important;
+    font-size: 14px !important;
+}}
+[data-testid="stFileUploaderDropzoneInstructions"] * {{
     color: {c['text']} !important;
 }}
 /* ── Metrics ── */
 [data-testid="metric-container"] {{
     background-color: {c['card']} !important;
     border: 1px solid {c['border']} !important;
+    border-top: 3px solid {c['accent']} !important;
     border-radius: 10px !important;
     padding: 16px !important;
+    box-shadow: 0 6px 24px rgba(27,42,74,0.12) !important;
 }}
 /* ── Chat input ── */
 .stChatInput, [data-testid="stChatInput"] textarea {{
@@ -157,7 +188,9 @@ h1, h2, h3, h4, h5, h6 {{
 [data-testid="stExpander"] {{
     background-color: {c['card']} !important;
     border: 1px solid {c['border']} !important;
+    border-top: 3px solid {c['accent']} !important;
     border-radius: 8px !important;
+    box-shadow: 0 6px 24px rgba(27,42,74,0.12) !important;
 }}
 /* ── Header branding (beats global div/span color reset) ── */
 .artha-header-row {{
@@ -202,9 +235,9 @@ h1, h2, h3, h4, h5, h6 {{
 .artha-brand-text {{
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     justify-content: center;
-    text-align: left;
+    text-align: center;
     flex: 1;
     min-width: 0;
     gap: clamp(6px, 1.2vw, 12px);
@@ -224,17 +257,17 @@ h1.artha-brand-title {{
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }}
 .artha-brand-tagline {{
-    font-size: clamp(1.05rem, 2.1vw + 0.35rem, 1.35rem);
+    font-size: clamp(1.2rem, 2.4vw + 0.5rem, 1.65rem);
     line-height: 1.45;
-    text-align: left;
-    color: {c['secondary']} !important;
+    text-align: center;
+    color: #000000 !important;
     margin: 0;
     padding: 0;
     max-width: 36rem;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: -0.015em;
-    opacity: 0.92;
+    opacity: 1;
 }}
 @media (max-width: 900px) {{
     .artha-brand-cluster {{
@@ -257,6 +290,63 @@ h1.artha-brand-title {{
     .artha-brand-text {{
         width: 100%;
     }}
+}}
+/* ── Step card animations ── */
+@keyframes pageFlip {{
+  0%,100% {{ transform: rotateY(0deg); }}
+  50%      {{ transform: rotateY(-25deg); }}
+}}
+@keyframes scanPulse {{
+  0%,100% {{ transform: translate(0,0) scale(1); opacity:1; }}
+  50%      {{ transform: translate(4px,4px) scale(1.08); opacity:0.85; }}
+}}
+@keyframes pulseRing {{
+  0%   {{ r: 13; opacity: 0.6; }}
+  100% {{ r: 22; opacity: 0; }}
+}}
+@keyframes typingDot {{
+  0%,80%,100% {{ transform: translateY(0); opacity:0.4; }}
+  40%          {{ transform: translateY(-5px); opacity:1; }}
+}}
+@keyframes floatCard {{
+  0%,100% {{ transform: translateY(0); }}
+  50%      {{ transform: translateY(-6px); }}
+}}
+.step-icon-wrap {{
+  width:80px; height:80px;
+  margin:0 auto 16px;
+  animation: floatCard 3s ease-in-out infinite;
+}}
+.step-icon-wrap.s2 {{ animation-delay: 0.7s; }}
+.step-icon-wrap.s3 {{ animation-delay: 1.4s; }}
+.step-doc-page {{
+  transform-origin: left center;
+  animation: pageFlip 2.4s ease-in-out infinite;
+}}
+.step-mag {{
+  animation: scanPulse 2s ease-in-out infinite;
+  transform-origin: center;
+}}
+.pulse-ring {{
+  animation: pulseRing 2s ease-out infinite;
+  transform-origin: 34px 32px;
+}}
+.dot1 {{ animation: typingDot 1.2s ease-in-out infinite; animation-delay:0s; }}
+.dot2 {{ animation: typingDot 1.2s ease-in-out infinite; animation-delay:0.2s; }}
+.dot3 {{ animation: typingDot 1.2s ease-in-out infinite; animation-delay:0.4s; }}
+.steps-label {{
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: {c['accent']} !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 6px 0;
+}}
+.steps-desc {{
+  font-size: 15px !important;
+  color: {c['accent']} !important;
+  font-weight: 500;
+  line-height: 1.5;
 }}
 /* ── Hide default Streamlit branding ── */
 #MainMenu, footer, header[data-testid="stHeader"] {{
@@ -386,7 +476,7 @@ def render_topbar():
     </div>
     <div class="artha-brand-text">
       <h1 class="artha-brand-title">ARTHA!</h1>
-      <p class="artha-brand-tagline">Your money has a story. Artha reads it!</p>
+      <p class="artha-brand-tagline">Your money has a story. Artha reads it.</p>
     </div>
   </div>
 </div>
@@ -445,35 +535,157 @@ def render_checkin():
 
 def render_onboarding():
     c = C()
-    st.markdown(
-        f"""
-<div style="background:{c['card']};border:1px solid {c['border']};border-radius:14px;
-     padding:36px 28px;margin-bottom:28px;">
-  <h2 style="color:{c['accent']};margin:0 0 28px;text-align:center;">Get started in 3 steps</h2>
-  <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;">
-    <div style="flex:1;min-width:160px;text-align:center;">
-      <div style="font-size:36px;">📄</div>
-      <div style="font-size:13px;font-weight:700;color:{c['accent']};margin:10px 0 6px;">Step 1</div>
-      <div style="font-size:14px;color:{c['secondary']};">Upload your bank statement PDFs</div>
+    accent = c['accent']
+    card   = c['card']
+    border = c['border']
+    components.html(f"""
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  body {{ background: transparent; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }}
+
+  .wrap {{
+    background: {card};
+    border: 1px solid {border};
+    border-top: 3px solid {accent};
+    border-radius: 14px;
+    padding: 40px 32px 36px;
+    box-shadow: 0 6px 28px rgba(27,42,74,0.13);
+  }}
+  h2 {{
+    color: {accent};
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 36px;
+  }}
+  .row {{
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }}
+  .step {{
+    flex: 1;
+    min-width: 180px;
+    text-align: center;
+  }}
+  .icon-wrap {{
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 16px;
+  }}
+  .label {{
+    font-size: 11px;
+    font-weight: 800;
+    color: {accent};
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }}
+  .desc {{
+    font-size: 15px;
+    color: {accent};
+    font-weight: 500;
+    line-height: 1.5;
+  }}
+  .footer {{
+    text-align: center;
+    font-size: 13px;
+    color: {accent};
+    margin-top: 32px;
+    font-weight: 600;
+    opacity: 0.7;
+  }}
+
+  /* float animation */
+  @keyframes float1 {{ 0%,100%{{transform:translateY(0)}} 50%{{transform:translateY(-6px)}} }}
+  @keyframes float2 {{ 0%,100%{{transform:translateY(0)}} 50%{{transform:translateY(-6px)}} }}
+  @keyframes float3 {{ 0%,100%{{transform:translateY(0)}} 50%{{transform:translateY(-6px)}} }}
+  .icon-wrap.s1 {{ animation: float1 3s ease-in-out infinite; }}
+  .icon-wrap.s2 {{ animation: float2 3s ease-in-out infinite; animation-delay: 0.7s; }}
+  .icon-wrap.s3 {{ animation: float3 3s ease-in-out infinite; animation-delay: 1.4s; }}
+
+  /* page flip */
+  @keyframes pageFlip {{ 0%,100%{{transform:rotateY(0)}} 50%{{transform:rotateY(-28deg)}} }}
+  .doc-lines {{ transform-origin: left center; animation: pageFlip 2.4s ease-in-out infinite; }}
+
+  /* magnifier scan */
+  @keyframes scan {{ 0%,100%{{transform:translate(0,0)}} 50%{{transform:translate(5px,5px)}} }}
+  .mag-glass {{ animation: scan 2s ease-in-out infinite; transform-origin: 34px 32px; }}
+  @keyframes pulseRing {{ 0%{{stroke-width:1.5;opacity:0.6}} 100%{{stroke-width:0;opacity:0}} }}
+  .pulse {{ animation: pulseRing 2s ease-out infinite; transform-box:fill-box; transform-origin:center; }}
+
+  /* typing dots */
+  @keyframes bounce {{ 0%,80%,100%{{transform:translateY(0);opacity:0.4}} 40%{{transform:translateY(-5px);opacity:1}} }}
+  .d1 {{ animation: bounce 1.2s ease-in-out infinite; animation-delay: 0s; }}
+  .d2 {{ animation: bounce 1.2s ease-in-out infinite; animation-delay: 0.2s; }}
+  .d3 {{ animation: bounce 1.2s ease-in-out infinite; animation-delay: 0.4s; }}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>Get started in 3 steps</h2>
+  <div class="row">
+
+    <div class="step">
+      <div class="icon-wrap s1">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+          <rect x="12" y="8" width="44" height="58" rx="6" fill="#EEF2FA" stroke="{accent}" stroke-width="2.5"/>
+          <g class="doc-lines">
+            <rect x="20" y="18" width="28" height="4" rx="2" fill="{accent}" opacity="0.3"/>
+            <rect x="20" y="27" width="28" height="3" rx="1.5" fill="{accent}" opacity="0.22"/>
+            <rect x="20" y="35" width="20" height="3" rx="1.5" fill="{accent}" opacity="0.22"/>
+            <rect x="20" y="43" width="24" height="3" rx="1.5" fill="{accent}" opacity="0.17"/>
+            <rect x="20" y="51" width="16" height="3" rx="1.5" fill="{accent}" opacity="0.17"/>
+          </g>
+          <circle cx="60" cy="60" r="14" fill="{accent}"/>
+          <path d="M54 60 L58 64 L67 55" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="label">Step 1</div>
+      <div class="desc">Upload your bank statement PDFs</div>
     </div>
-    <div style="flex:1;min-width:160px;text-align:center;">
-      <div style="font-size:36px;">🔍</div>
-      <div style="font-size:13px;font-weight:700;color:{c['accent']};margin:10px 0 6px;">Step 2</div>
-      <div style="font-size:14px;color:{c['secondary']};">Artha reads and analyzes your finances</div>
+
+    <div class="step">
+      <div class="icon-wrap s2">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+          <circle cx="34" cy="32" r="22" fill="#EEF2FA" stroke="{accent}" stroke-width="2.5"/>
+          <circle class="pulse" cx="34" cy="32" r="22" fill="none" stroke="{accent}" stroke-width="3" opacity="0.4"/>
+          <g class="mag-glass">
+            <circle cx="34" cy="32" r="22" fill="none" stroke="{accent}" stroke-width="2.5"/>
+            <line x1="50" y1="48" x2="66" y2="64" stroke="{accent}" stroke-width="5" stroke-linecap="round"/>
+            <path d="M26 28 Q30 22 38 26" stroke="{accent}" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+          </g>
+        </svg>
+      </div>
+      <div class="label">Step 2</div>
+      <div class="desc">Artha reads and analyzes your finances</div>
     </div>
-    <div style="flex:1;min-width:160px;text-align:center;">
-      <div style="font-size:36px;">💬</div>
-      <div style="font-size:13px;font-weight:700;color:{c['accent']};margin:10px 0 6px;">Step 3</div>
-      <div style="font-size:14px;color:{c['secondary']};">Ask Artha anything about your money</div>
+
+    <div class="step">
+      <div class="icon-wrap s3">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+          <rect x="6" y="10" width="56" height="42" rx="11" fill="{accent}"/>
+          <polygon points="16,52 10,68 32,56" fill="{accent}"/>
+          <circle class="d1" cx="24" cy="31" r="4.5" fill="white"/>
+          <circle class="d2" cx="37" cy="31" r="4.5" fill="white"/>
+          <circle class="d3" cx="50" cy="31" r="4.5" fill="white"/>
+        </svg>
+      </div>
+      <div class="label">Step 3</div>
+      <div class="desc">Ask Artha anything about your money</div>
     </div>
+
   </div>
-  <p style="text-align:center;font-size:12px;color:{c['secondary']};margin:28px 0 0;">
-    🔒 No account needed. No data leaves your device. Ever.
-  </p>
+  <p class="footer">🔒 No account needed. No data leaves your device. Ever.</p>
 </div>
-""",
-        unsafe_allow_html=True,
-    )
+</body>
+</html>
+""", height=310)
+
 
 
 # ── Upload section ─────────────────────────────────────────────────────────────
