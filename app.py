@@ -1,5 +1,6 @@
 import streamlit as st
 import streamlit.components.v1 as components
+import base64
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -17,7 +18,7 @@ from exporter import export_to_pdf, export_to_text
 load_dotenv()
 
 st.set_page_config(
-    page_title="Artha — Personal Finance Agent",
+    page_title="Artha - Personal Finance Agent",
     page_icon="💰",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -60,13 +61,15 @@ def C():
 
 def inject_css():
     c = C()
+    is_dark = st.session_state.get("dark_mode", False)
+    dot_color = "rgba(255,255,255,0.10)" if is_dark else "rgba(27,42,74,0.13)"
     st.markdown(
         f"""
 <style>
 /* ── Dot pattern on the root elements that Streamlit can't override ── */
 html, body {{
     background-color: {c['bg']} !important;
-    background-image: radial-gradient(circle, rgba(27,42,74,0.13) 1.5px, transparent 1.5px) !important;
+    background-image: radial-gradient(circle, {dot_color} 1.5px, transparent 1.5px) !important;
     background-size: 22px 22px !important;
     background-attachment: fixed !important;
 }}
@@ -233,7 +236,7 @@ input::placeholder, textarea::placeholder {{
 [data-testid="stExpander"] summary p {{
     color: {c['text']} !important;
 }}
-/* ── Header branding (beats global div/span color reset) ── */
+/* ── Header branding ── */
 .artha-header-row {{
     position: relative;
     width: 100%;
@@ -250,28 +253,50 @@ input::placeholder, textarea::placeholder {{
     width: 100%;
     max-width: 100%;
 }}
-.artha-logo-square {{
-    width: clamp(56px, 11vw, 76px);
-    height: clamp(56px, 11vw, 76px);
-    background: #1B2A4A !important;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.artha-seal-img {{
     flex-shrink: 0;
-    align-self: flex-start;
-    margin-top: clamp(2px, 0.6vw, 8px);
-    box-shadow:
-        0 2px 8px rgba(27, 42, 74, 0.18),
-        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+    align-self: center;
+    border-radius: 50%;
+    width: clamp(80px, 12vw, 96px);
+    height: clamp(80px, 12vw, 96px);
 }}
-.artha-logo-letter {{
-    font-size: clamp(28px, 6.5vw, 40px);
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -0.03em;
+/* ── Animated theme toggle — column-based selector (st.markdown divs don't nest buttons) ── */
+[data-testid="stHorizontalBlock"]:first-of-type > [data-testid="stColumn"]:last-child {{
+    padding-top: clamp(20px, 3vw, 36px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+}}
+[data-testid="stHorizontalBlock"]:first-of-type > [data-testid="stColumn"]:last-child .stButton > button,
+[data-testid="stHorizontalBlock"]:first-of-type > [data-testid="stColumn"]:last-child [data-testid="stBaseButton-secondary"] {{
+    background: linear-gradient(135deg, {c['accent']} 0%, #3A5BA0 100%) !important;
     color: #FFFFFF !important;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    border: 2px solid rgba(255,255,255,0.25) !important;
+    border-radius: 50px !important;
+    padding: 12px 28px !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em !important;
+    min-width: 130px !important;
+    box-shadow: 0 4px 20px rgba(27,42,74,0.5), 0 0 0 0 rgba(74,122,187,0) !important;
+    animation: togglePulse 2.5s ease-in-out infinite !important;
+    transition: transform 0.25s ease !important;
+}}
+[data-testid="stHorizontalBlock"]:first-of-type > [data-testid="stColumn"]:last-child .stButton > button:hover,
+[data-testid="stHorizontalBlock"]:first-of-type > [data-testid="stColumn"]:last-child [data-testid="stBaseButton-secondary"]:hover {{
+    transform: translateY(-3px) scale(1.07) !important;
+    opacity: 1 !important;
+}}
+@keyframes togglePulse {{
+    0%,100% {{
+        box-shadow: 0 4px 20px rgba(27,42,74,0.5), 0 0 0 0 rgba(74,122,187,0);
+        transform: scale(1);
+    }}
+    50% {{
+        box-shadow: 0 6px 28px rgba(27,42,74,0.6), 0 0 0 7px rgba(74,122,187,0.18);
+        transform: scale(1.03);
+    }}
 }}
 .artha-brand-text {{
     display: flex;
@@ -505,16 +530,34 @@ def show_api_error():
 
 def render_topbar():
     c = C()
-    col_main, col_toggle = st.columns([14, 1])
+
+    # viewBox 90x90, outer circle r=44, text ring r=35 (text top = 35+8 = 43 < 44, stays inside)
+    # Circumference at r=35 = 2π×35 = 220px. 16 chars × 13.75px each → letter-spacing = 13.75 - 5 = 8.75 ≈ 9
+    seal_svg = """<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <path id="seal-ring" d="M 45,10 a 35,35 0 1,1 -0.01,0"/>
+  </defs>
+  <circle cx="45" cy="45" r="44" fill="#1B2A4A"/>
+  <circle cx="45" cy="45" r="42" fill="none" stroke="rgba(255,255,255,0.20)" stroke-width="1.2"/>
+  <circle cx="45" cy="45" r="29" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.8" stroke-dasharray="2.5 3.5"/>
+  <text font-size="8" font-weight="800" fill="rgba(255,255,255,0.80)" letter-spacing="9"
+        font-family="system-ui,-apple-system,sans-serif">
+    <textPath href="#seal-ring" xlink:href="#seal-ring" startOffset="0%">ARTHA · ARTHA · </textPath>
+  </text>
+  <text x="45" y="56" text-anchor="middle" font-size="30" font-weight="900"
+        fill="#FFFFFF" font-family="system-ui,-apple-system,sans-serif" letter-spacing="-1.5">A</text>
+</svg>"""
+    seal_b64 = base64.b64encode(seal_svg.encode("utf-8")).decode("utf-8")
+    seal_src = f"data:image/svg+xml;base64,{seal_b64}"
+
+    col_main, col_toggle = st.columns([13, 2])
 
     with col_main:
         st.markdown(
             f"""
 <div class="artha-header-row">
   <div class="artha-brand-cluster">
-    <div class="artha-logo-square">
-      <span class="artha-logo-letter">A</span>
-    </div>
+    <img src="{seal_src}" class="artha-seal-img" alt="Artha logo" />
     <div class="artha-brand-text">
       <h1 class="artha-brand-title">ARTHA!</h1>
       <p class="artha-brand-tagline">Your money has a story. Artha reads it.</p>
